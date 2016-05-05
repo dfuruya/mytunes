@@ -8,6 +8,7 @@
     <script src="bower_components/backbone/backbone.js"></script>
 
     <script src="data/data.js"></script>
+    <script src="env/config.js"></script>
 
     <script src="models/SongModel.js"></script>
     <script src="collections/Songs.js"></script>
@@ -24,14 +25,23 @@
     <script>
       $(function() {
         // set up model objects
-        var library = new Songs(songData);
-        var app = new AppModel({library: library});
-
-        // build a view for the top level of the whole app
-        var appView = new AppView({model: app});
-
-        // put the view onto the screen
-        $('body').append(appView.render());
+        var library, app, appView;
+        var url = 'https://api.parse.com/1/classes/songs/';
+        $.ajax({
+          url: url,
+          type: 'GET',
+          success: function(data) {
+            library = new Songs(data.results);
+            app = new AppModel({library: library});
+            // build a view for the top level of the whole app
+            appView = new AppView({model: app});
+            // put the view onto the screen
+            $('body').append(appView.render());
+          },
+          error: function(err) {
+            console.error('Error fetching songs: ', err);
+          }
+        });
       });
     </script>
   </body>
